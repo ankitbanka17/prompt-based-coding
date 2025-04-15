@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<idea-plugin>
+    <id>com.example.openaiembeddingsplugin</id>
+    <name>OpenAI Code Embedding Plugin</name>
+    <description>A plugin that stores code embeddings and modifies code based on a prompt</description>
+    <version>1.0</version>
+    <vendor>Your Name</vendor>
+
+    <idea-version since-build="223" until-build="241.*" />
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Register the tool window -->
+        <toolWindow id="PromptBasedCoding" factoryClass="com.github.ankitbanka17.promptbasedcoding.MyToolWindowFactory"
+                    anchor="bottom" icon="/icons/your_icon.png"/>
+    </extensions>
+    <actions>
+        <action id="ScanFilesAction"
+                class="com.github.ankitbanka17.promptbasedcoding.services.ScanFilesAction"
+                text="Scan Project for Code Embedding"
+                description="Scans and ingests code from all project files">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+        <action id="ModifyCodeByPromptAction"
+                class="com.github.ankitbanka17.promptbasedcoding.services.ModifyCodeByPromptAction"
+                text="Modify Code by Prompt"
+                description="Retrieve relevant code and modify it based on a prompt">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+
+
+</idea-plugin>
