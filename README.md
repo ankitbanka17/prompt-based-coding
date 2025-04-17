@@ -1,51 +1,112 @@
 # prompt-based-coding
 
-![Build](https://github.com/ankitbanka17/prompt-based-coding/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
+An IntelliJ IDEA plugin project that leverages OpenAI to interpret natural language prompts and automatically create or modify Java Spring Boot code within your development workspace. This repository contains the complete source code for the plugin—no marketplace distribution is provided.
 
-## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [ ] Get familiar with the [template documentation][template].
-- [ ] Adjust the [pluginGroup](./gradle.properties) and [pluginName](./gradle.properties), as well as the [id](./src/main/resources/META-INF/plugin.xml) and [sources package](./src/main/kotlin).
-- [ ] Adjust the plugin description in `README` (see [Tips][docs:plugin-description])
-- [ ] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html?from=IJPluginTemplate).
-- [ ] [Publish a plugin manually](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate) for the first time.
-- [ ] Set the `MARKETPLACE_ID` in the above README badges. You can obtain it once the plugin is published to JetBrains Marketplace.
-- [ ] Set the [Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html?from=IJPluginTemplate) related [secrets](https://github.com/JetBrains/intellij-platform-plugin-template#environment-variables).
-- [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html?from=IJPluginTemplate).
-- [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
+## Features
 
-<!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+- **Natural Language to Code**: Interpret developer prompts in plain English and translate them into actionable code changes.
+- **Class Creation & Modification**: Automatically generate new classes or update existing ones based on structured JSON instructions.
+- **Context Awareness**: Retrieve existing code context (classes, methods, imports) to ensure accurate modifications.
+- **JSON-Based Instruction Extraction**: Use GPT-4o-mini to parse prompts into structured instructions (`action`, `newClasses`, `modifiedClasses`, etc.).
+- **Embedded Tool Window**: A custom Tool Window in IntelliJ for prompt input and instant feedback within the IDE.
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
+## Getting Started
 
-To keep everything working, do not remove `<!-- ... -->` sections. 
-<!-- Plugin description end -->
+### Prerequisites
 
-## Installation
+- IntelliJ IDEA Community or Ultimate (version 2021.3 or newer)
+- Java 11 or higher
+- Gradle (wrapper included)
+- An OpenAI API key
 
-- Using the IDE built-in plugin system:
-  
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "prompt-based-coding"</kbd> >
-  <kbd>Install</kbd>
-  
-- Using JetBrains Marketplace:
+### Building the Plugin
 
-  Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID) and install it by clicking the <kbd>Install to ...</kbd> button in case your IDE is running.
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/ankitbanka17/prompt-based-coding.git
+   cd prompt-based-coding
+   ```
+2. Configure your OpenAI API key (see Configuration below).
+3. Build the plugin JAR:
+   ```bash
+   ./gradlew clean build
+   ```
+   The resulting plugin artifact will be at `build/distributions/prompt-based-coding.zip`.
 
-  You can also download the [latest release](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID/versions) from JetBrains Marketplace and install it manually using
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+### Installing Locally
 
-- Manually:
+1. In IntelliJ IDEA, go to **Settings** ➔ **Plugins**.
+2. Click the gear icon and choose **Install Plugin from Disk...**
+3. Select the generated ZIP (`build/distributions/prompt-based-coding.zip`).
+4. Restart the IDE to activate the plugin.
 
-  Download the [latest release](https://github.com/ankitbanka17/prompt-based-coding/releases/latest) and install it manually using
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+### Running in Dev Mode
 
+For iterative development, you can launch a sandbox instance of IntelliJ:
+```bash
+./gradlew runIde
+```
+This opens a fresh IDE with your plugin loaded, isolating it from your main IDE settings.
 
----
-Plugin based on the [IntelliJ Platform Plugin Template][template].
+## Usage
 
-[template]: https://github.com/JetBrains/intellij-platform-plugin-template
-[docs:plugin-description]: https://plugins.jetbrains.com/docs/intellij/plugin-user-experience.html#plugin-description-and-presentation
+1. Open the **Prompt-Based Coding** tool window: `View` ➔ `Tool Windows` ➔ **Code Assistant**.
+2. Enter a natural language instruction, for example:
+   ```text
+   Add a REST controller for user management with CRUD endpoints.
+   ```
+3. Press **Submit**. The plugin will:
+   - Send the prompt to `LLMAdapter` for instruction extraction.
+   - Locate or create target code files via `PromptProcessor`.
+   - Apply modifications or generate new code using `CodeModifier`.
+   - Write changes to your project and display results in the tool window.
+
+## Configuration
+
+All settings are under **File** ➔ **Settings** ➔ **Other Settings** ➔ **Prompt-Based Coding**:
+
+- **OpenAI API Key**: Your API key (e.g., `sk-...`).
+- **Instruction Model**: Model for extracting JSON instructions (default: `gpt-4o-mini`).
+- **Modification Model**: Model for code changes (default: `gpt-4`).
+- **Prompt Templates**: Editable templates located in `src/main/resources/prompts/`.
+
+## Project Structure
+
+```
+prompt-based-coding/
+├── src/
+│   ├── main/
+│   │   ├── kotlin/com/github/ankitbanka17/promptbasedcoding/
+│   │   │   ├── adapter/LLMAdapter.kt
+│   │   │   ├── handlers/PromptProcessor.kt
+│   │   │   ├── services/CodeModifier.kt
+│   │   │   ├── tools/MyToolWindow.kt
+│   │   │   └── util/PromptBuilder.kt
+│   │   └── resources/prompts/
+│   │       └── code_instructions.txt
+│   └── test/
+├── build.gradle.kts
+├── settings.gradle.kts
+├── gradle/
+└── gradlew*  
+```
+
+## Contributing
+
+1. Fork the repository.
+2. Create a feature branch:
+   ```bash
+git checkout -b feature/my-feature
+   ```
+3. Commit your changes:
+   ```bash
+git commit -m "Add my feature"
+   ```
+4. Push to your branch and open a Pull Request.
+
+Please follow code style conventions and include unit tests for new features.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
