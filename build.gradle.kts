@@ -10,7 +10,7 @@ repositories {
 dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("org.json:json:20231013")
-    implementation("com.microsoft.onnxruntime:onnxruntime:1.17.0")
+    implementation("com.microsoft.onnxruntime:onnxruntime:1.21.0")
 }
 
 intellij {
