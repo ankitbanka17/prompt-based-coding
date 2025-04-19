@@ -92,20 +92,6 @@ prompt-based-coding/
 └── gradlew*  
 ```
 
-## Contributing
-
-1. Fork the repository.
-2. Create a feature branch:
-   ```bash
-git checkout -b feature/my-feature
-   ```
-3. Commit your changes:
-   ```bash
-git commit -m "Add my feature"
-   ```
-4. Push to your branch and open a Pull Request.
-
-Please follow code style conventions and include unit tests for new features.
 
 ## License
 
