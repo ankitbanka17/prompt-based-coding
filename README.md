@@ -1,4 +1,6 @@
-# prompt-based-coding !Caution: Pre-Alpha, early stage dev 
+## Prompt Based Coding
+
+🚧 Caution: Pre-Alpha — Early Stage Development
 
 
 An IntelliJ IDEA plugin project that leverages OpenAI to interpret natural language prompts and automatically create or modify Java Spring Boot code within your development workspace. This repository contains the complete source code for the plugin—no marketplace distribution is provided.
