@@ -4,6 +4,7 @@ import com.github.ankitbanka17.promptbasedcoding.services.GlobalCodeMetaData
 import com.github.ankitbanka17.promptbasedcoding.util.PromptBuilder
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -46,6 +47,55 @@ class LLMAdapter(
                 ?: "{}"
 
             return parseResponseContent(content)
+        }
+    }
+    fun retrieveModifiedCode(
+        systemPrompt: String,
+        userPrompt: String,
+        classRequired: String
+    ): Array<String>? {
+        val json = JSONObject().apply {
+            put("model", "gpt-4o")
+            put("response_format", JSONObject().put("type", "json_object"))
+            put("temperature", 0.3)
+            put(
+                "messages", listOf(
+                    JSONObject().put("role", "system").put("content", systemPrompt),
+                    JSONObject().put("role", "user").put(
+                        "content",
+                        userPrompt + "\n In this step provide code for only this class: " + classRequired
+                    )
+                )
+            )
+        }
+
+        val body = RequestBody.create("application/json".toMediaTypeOrNull(), json.toString())
+        val request = Request.Builder()
+            .url("https://api.openai.com/v1/chat/completions")
+            .post(body)
+            .addHeader("Authorization", "Bearer $apiKey")
+            .build()
+
+        val response = client.newCall(request).execute()
+
+        return if (response.isSuccessful) {
+            val responseBody = response.body?.string() ?: return null
+            val choices = JSONObject(responseBody).getJSONArray("choices")
+            if (choices.length() > 0) {
+                val messageContent = choices.getJSONObject(0)
+                    .getJSONObject("message")
+                    .getString("content")
+
+                // Parse the JSON response returned by the AI
+                val responseJson = JSONObject(messageContent)
+                val fileName = responseJson.optString("fileName", "DefaultFileName.kt")
+                val codeContent = responseJson.optString("code", "")
+
+                arrayOf(fileName, codeContent)
+            } else null
+        } else {
+            println("Error modifying code: ${response.message}")
+            null
         }
     }
 
